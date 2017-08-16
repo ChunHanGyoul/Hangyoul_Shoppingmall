@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Board">
+	<select id = "getMemberDTO" parameterType = "java.util.Map" resultType="han.gyoul.shop.member.dto.MemberDTO">
+		select * from member_table where mb_no = ${mb_no}
+	</select>
+	<select id = "searchItem" parameterType = "han.gyoul.shop.order.dto.OrderDTO" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+		select * from item_table where item_no = #{item_no}
+	</select>
+	<select id = "isAlreadyItem" parameterType = "han.gyoul.shop.order.dto.OrderDTO" resultType = "han.gyoul.shop.order.dto.OrderDTO">
+		select * from order_table where mb_no = #{mb_no} and item_no = #{item_no} and pay_state = 'false'		
+	</select>
+	<insert id = "addCart" parameterType = "han.gyoul.shop.order.dto.OrderDTO">
+		insert into order_table(order_no, mb_no, item_no, order_qty, pay_state, tot_price)
+		values(order_seq.nextval,#{mb_no},#{item_no},1, 'false', #{tot_price})
+	</insert>
+	<select id = "getOrderDTOs" parameterType = "han.gyoul.shop.member.dto.MemberDTO" resultType = "han.gyoul.shop.order.dto.OrderDTO">
+		select * from order_table
+		where mb_no = #{mb_no} and pay_state = 'false'
+	</select>
+	<select id = "getItemDTO" parameterType = "han.gyoul.shop.order.dto.OrderDTO" resultType = "han.gyoul.shop.dto.ItemManagementDTO">
+		select * from item_table
+		where item_no = #{item_no}
+	</select>
+	<update id = "orderItems" parameterType = "java.util.Map">
+		update order_table set pay_state = 'true', orderdetail_no = ${orderdetail_no} 
+		where mb_no = ${mb_no} and pay_state = 'false'
+	</update>
+	<insert id = "makeOrderDetail" parameterType = "java.util.Map">
+		insert into orderdetail_table(orderdetail_no,delivery_state,mb_no, receiver_name, receiver_mobile, receiver_email,receiver_zipcode, receiver_address, receiver_memo, pay_method, bank_kind, bank_acct, bank_sender)
+		values(orderdetail_seq.nextval, '배송준비중', ${mb_no}, '${receiver_name}', '${receiver_mobile}', '${receiver_email}','${receiver_zipcode}', '${receiver_address}', '${receiver_memo}', '${pay_method}', '${bank_kind}', '${bank_acct}', '${bank_sender}')
+	</insert>
+	<select id = "getOrderdetail_no" resultType="java.lang.Integer">
+		select max(orderdetail_no) from orderdetail_table
+	</select>
+	<delete id = "removeCart" parameterType = "java.util.Map">
+		delete from order_table
+		where mb_no = ${mb_no} and item_no = ${item_no} and pay_state = 'false'
+	</delete>
+	<delete id = "removeAllCart" parameterType = "han.gyoul.shop.member.dto.MemberDTO">
+		delete from order_table
+		where mb_no = ${mb_no} and pay_state = 'false'
+	</delete>
+	<select id = "getOrderdetailDTO" parameterType = "han.gyoul.shop.member.dto.MemberDTO" resultType="han.gyoul.shop.order.dto.OrderdetailDTO">
+		select * from orderdetail_table
+		where mb_no = #{mb_no} order by orderdetail_no
+	</select>
+	<select id = "getPayOrderDTOs" parameterType = "han.gyoul.shop.member.dto.MemberDTO" resultType = "han.gyoul.shop.order.dto.OrderDTO">
+		select * from order_table
+		where mb_no = #{mb_no} and pay_state = 'true' order by order_no
+	</select>
+	<select id = "getPayItemDTO" parameterType = "han.gyoul.shop.order.dto.OrderDTO" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+		select * from item_table
+		where item_no = #{item_no}
+	</select>
+	<select id = "getAllOrderdetailDTO" resultType="han.gyoul.shop.order.dto.OrderdetailDTO">
+		select * from orderdetail_table order by orderdetail_no
+	</select>
+	<select id = "getAllPayOrderDTOs" resultType="han.gyoul.shop.order.dto.OrderDTO">
+		select * from order_table
+		where pay_state = 'true' order by order_no
+	</select>
+	<update id = "changeDeliveryState" parameterType = "java.util.Map">
+		update orderdetail_table set delivery_state = '${delivery_state}'
+		where orderdetail_no = ${orderdetail_no}
+	</update>
+</mapper>

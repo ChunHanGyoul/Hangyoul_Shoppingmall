@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?> <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="Notice">
+	<select id = "getSearchListCount" parameterType="java.util.Map" resultType="java.lang.Integer">
+		select count(*) from notice where ${value}
+	</select>
+	<select id="getListCount" resultType="java.lang.Integer">
+		select count(*) from notice
+	</select>
+<!-- 	<select id="getReplyCount" parameterType = "han.com.board.model.ReplyDTO" resultType="java.lang.Integer"> -->
+<!-- 		select count(*) from reply_table where board_no = #{board_no} -->
+<!-- 	</select> -->
+	<select id="getMaxCount" resultType="java.lang.Integer">
+		select max(num) from notice
+	</select>
+	<select id="getNoticeList" parameterType="java.util.Map" resultType="han.gyoul.shop.board.model.NoticeDTO">
+		<![CDATA[ 
+		select * from
+  			(select rownum rnum, num, name, subject, content, answer_num, answer_lev, answer_seq, read_count, write_date from
+    			(select * from notice order by num desc)
+ 			)
+		where rnum>=#{startrow} and rnum<=#{endrow}
+		]]>
+	</select>
+<!-- 	<select id="getReplyList" parameterType="han.com.board.model.BoardDTO" resultType="han.com.board.model.ReplyDTO"> -->
+<!-- 		<![CDATA[  -->
+<!-- 		select * from reply_table -->
+<!-- 		where board_no = #{num} -->
+<!-- 		]]> -->
+<!-- 	</select> -->
+	<insert id="noticeInsert" parameterType="han.gyoul.shop.board.model.NoticeDTO">
+		insert into notice (num,name,pass,subject,content,
+		answer_num,answer_lev,answer_seq,read_count,write_date)
+		values(notice_seq.nextval,#{name},#{pass},#{subject},#{content},#{num},0,0,0,sysdate)
+	</insert>
+	<select id = "getDetail" parameterType="han.gyoul.shop.board.model.NoticeDTO" resultType="han.gyoul.shop.board.model.NoticeDTO">
+		select * from notice
+		where num = #{num}
+	</select>
+	<update id="setReadCountUpdate" parameterType="han.gyoul.shop.board.model.NoticeDTO">
+		update notice set read_count = read_count+1 where num = #{num}
+	</update>
+	<update id="noticeModify" parameterType="han.gyoul.shop.board.model.NoticeDTO">
+		update notice set name=#{name}, subject=#{subject},content=#{content}
+		where num=#{num}
+	</update>
+	<select id="isNoticeWriter" parameterType="java.util.Map" resultType="han.gyoul.shop.board.model.NoticeDTO">
+		select * from notice where num=#{num} and pass=#{pass}
+	</select>
+	<select id = "getMaxNum" resultType = "java.lang.Integer">
+		select max(num) from notice
+	</select>
+<!-- 	<update id="boardReplyUpdate" parameterType="han.com.board.model.BoardDTO"> -->
+<!-- 		update notice set answer_seq=answer_seq+1 -->
+<!-- 		where answer_num=#{answer_num} and answer_seq>#{answer_seq} -->
+<!-- 	</update> -->
+<!-- 	<insert id = "boardReply" parameterType="han.com.board.model.BoardDTO"> -->
+<!-- 		insert into notice (num,name,pass,subject,content,attached_file, answer_num,answer_lev,answer_seq,read_count,write_date) -->
+<!-- 		values(#{num},#{name},#{pass},#{subject},#{content},#{attached_file},#{answer_num},#{answer_lev},#{answer_seq},0,sysdate) -->
+<!-- 	</insert> -->
+	<select id = "getSearchList" parameterType="java.util.Map" resultType="han.gyoul.shop.board.model.NoticeDTO">
+		<![CDATA[ 
+		select * from (select rownum rnum,num,name,subject,content,attached_file,answer_num,answer_lev,answer_seq,read_count,write_date
+		from
+			(select * from notice order by answer_num desc, answer_seq asc)
+			where ${searchCall})
+		where rnum>=${startrow} and rnum<=${endrow}
+		]]>
+	</select>
+	<delete id="noticeDelete" parameterType="han.gyoul.shop.board.model.NoticeDTO">
+		delete from notice where num=#{num}
+	</delete>
+<!-- 	<select id="isReplyWriter" parameterType="java.util.Map" resultType="han.com.board.model.ReplyDTO"> -->
+<!-- 		select * from reply_table where reply_no=#{replyNum} and reply_pass=#{reply_password} -->
+<!-- 	</select> -->
+<!-- 	<delete id="replyDelete" parameterType="han.com.board.model.ReplyDTO"> -->
+<!-- 		delete from reply_table where reply_no=#{reply_no} -->
+<!-- 	</delete> -->
+<!-- 	<insert id="replyInsert" parameterType="han.com.board.model.ReplyDTO"> -->
+<!-- 		insert into reply_table -->
+<!-- 		values(reply_seq.nextval, #{board_no}, #{reply_pass}, #{reply_writer}, #{reply_content}) -->
+<!-- 	</insert> -->
+<!-- 	<update id = "replyChange" parameterType="java.util.Map"> -->
+<!-- 		update reply_table -->
+<!-- 		set reply_writer = '${writer}', reply_content = '${content}' -->
+<!-- 		where reply_no = ${no} -->
+<!-- 	</update> -->
+</mapper>

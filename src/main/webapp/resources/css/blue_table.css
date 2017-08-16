@@ -1,0 +1,29 @@
+
+.blue_table table {
+	width:100%;
+	margin:15px 0;
+	border:0;
+}
+.blue_table th {
+	background-color:#50C2FF;
+	color:#FFFFFF
+}
+.blue_table,.blue_table th,.blue_table td {
+	font-size:0.95em;
+	text-align:center;
+	padding:4px;
+	border-collapse:collapse;
+}
+.blue_table th,.blue_table td {
+	border: 1px solid #9bdcfe;
+	border-width:1px 0 1px 0
+}
+.blue_table tr {
+	border: 1px solid #9bdcfe;
+}
+.blue_table tr:nth-child(odd){
+	background-color:#c4eafe;
+}
+.blue_table tr:nth-child(even){
+	background-color:#fdfdfd;
+}

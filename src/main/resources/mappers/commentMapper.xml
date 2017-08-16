@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="han.gyoul.shop.mapper.CommentMapper">
+	<select id="list" resultType="han.gyoul.shop.review.dto.CommentDTO">
+		select * 
+		from review_comment_table 
+		where review_no = #{review_no} 
+		order by comment_no desc
+	</select>
+	
+	<insert id="insert">
+		insert into review_comment_table (comment_no, review_no, comment_content, mb_id) 
+		values (review_comment_table_seq.nextval, #{review_no}, #{comment_content}, #{mb_id})
+	</insert>
+	
+	<update id="update">
+		update review_comment_table 
+		set comment_content = #{comment_content}, comment_date = sysdate 
+		where comment_no = #{comment_no}
+	</update>
+	
+	<delete id="delete">
+		delete from review_comment_table where comment_no = #{comment_no}
+	</delete>
+	
+	<select id="listPage" resultType="han.gyoul.shop.review.dto.CommentDTO">
+	<![CDATA[
+		select * 
+			from(select comment_no, comment_date, comment_content, review_no, mb_id
+			, row_number() over(order by comment_no desc, comment_date desc) rn 
+			from review_comment_table 
+			where review_no = #{review_no}) 
+			where rn BETWEEN #{cri.page} + (#{cri.perPageNum} * (#{cri.page} - 1)) AND #{cri.perPageNum} * #{cri.page}
+			order by rn
+			]]>
+	</select>
+	
+<select id="count" resultType="int">
+		select count(review_no) from review_comment_table where review_no = #{review_no}
+	</select>
+	
+	<select id="getReview_no" resultType="int">
+		select review_no from review_comment_table where comment_no = #{comment_no}
+	</select>
+</mapper>

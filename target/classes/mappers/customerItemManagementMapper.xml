@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="han.gyoul.shop.mapper.CustomerItemManagementMapper">
+
+	<select id="customerViewItemDetail" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+	  select * from item_table
+	  where item_no = #{item_no}
+	</select>
+    
+		<select id="customerListAll" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+ <![CDATA[
+ select * from item_table 
+ where item_no > 0 
+ order by item_no desc, category_name desc
+ ]]>
+	</select>
+	
+ <select id="listPage" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+ <![CDATA[
+ select * 
+from(select category_name, 
+, item_no 
+, item_name 
+, item_price
+, item_discount
+, row_number() over(order by item_no desc, category_name desc) rn 
+from item_table 
+where item_no > 0) 
+where rn BETWEEN #{page} AND #{page}+10
+order by rn
+ ]]>
+	</select>
+	
+ <select id="listCriteria" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+ <![CDATA[
+select * 
+from(select category_name
+, item_no 
+, item_name 
+, item_price
+, item_discount
+, row_number() over(order by item_no desc, category_name desc) rn 
+from item_table 
+where item_no > 0) 
+where rn BETWEEN #{page} + (#{perPageNum} * (#{page} - 1)) AND #{perPageNum} * #{page}
+order by rn
+ ]]>
+	</select>
+	
+	<select id="countPaging" resultType="int">
+ <![CDATA[
+ select 
+   count(item_no) 
+ from 
+   item_table
+ where 
+   item_no > 0 
+ ]]>
+	</select>
+	
+	 <sql id="search1">
+      <if test="searchType == null">
+
+      </if>
+      <if test="searchType != null">
+
+         <if test="searchType == 't'.toString()">
+            and item_name like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'c'.toString()">
+            and category_name like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'p'.toString()">
+            and item_price like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'tc'.toString()">
+            and ( item_name like ('%'|| #{keyword}|| '%') OR category_name like
+            ('%'||
+            #{keyword}|| '%'))
+         </if>
+         <if test="searchType == 'cp'.toString()">
+            and ( category_name like ('%'|| #{keyword}|| '%') OR item_price
+            like ('%'||
+            #{keyword}|| '%'))
+         </if>
+         <if test="searchType == 'tcp'.toString()">
+            and ( item_name like ('%'|| #{keyword}|| '%')
+            OR
+            category_name like
+            ('%'|| #{keyword}|| '%')
+            OR
+            item_price like ('%'|| #{keyword}|| '%'))
+         </if>
+
+      </if>
+   </sql>
+
+   <sql id="search">
+      <if test="searchType == null">
+         ) where item_no > 0
+      </if>
+      <if test="searchType == ''.toString()">
+         and item_name like ('%'|| #{keyword}|| '%')) where item_no > 0
+      </if>
+      <if test="searchType == 't'.toString()">
+         and item_name like ('%'|| #{keyword}|| '%')) where item_no > 0
+      </if>
+      <if test="searchType == 'c'.toString()">
+         and category_name like ('%'|| #{keyword}|| '%')) where item_no > 0
+      </if>
+      <if test="searchType == 'p'.toString()">
+         and item_price like ('%'|| #{keyword}|| '%')) where item_no > 0
+      </if>
+      <if test="searchType == 'tc'.toString()">
+         and ( item_name like ('%'|| #{keyword}|| '%') OR category_name like
+         ('%'||
+         #{keyword}|| '%'))) where item_no > 0
+      </if>
+      <if test="searchType == 'cp'.toString()">
+         and ( category_name like ('%'|| #{keyword}|| '%') OR item_price like
+         ('%'||
+         #{keyword}|| '%'))) where item_no > 0
+      </if>
+      <if test="searchType == 'tcp'.toString()">
+         and ( item_name like ('%'|| #{keyword}|| '%')) where item_no > 0
+         OR
+         category_name like ('%'|| #{keyword}|| '%')) where item_no > 0
+         OR
+         item_price like
+         ('%'|| #{keyword}|| '%'))) where item_no > 0
+      </if>
+
+   </sql>
+
+	
+	
+ <select id="listSearch" resultType="han.gyoul.shop.dto.ItemManagementDTO">
+<![CDATA[  
+  select *
+  from(select category_name
+, item_no 
+, item_name 
+, item_price
+, item_discount
+, row_number() over(order by item_no desc) rn 
+from item_table 
+  where item_no > 0 
+]]>
+      <include refid="search"></include> 
+<![CDATA[    
+  AND rn BETWEEN #{page} + (#{perPageNum} * (#{page} - 1)) AND #{perPageNum} * #{page}
+  order by rn
+  
+]]>
+   </select>
+
+   <select id="listSearchCount" resultType="int">
+<![CDATA[ 
+select count(item_no) 
+from item_table 
+where item_no > 0 
+]]>
+      <include refid="search1"></include>
+
+   </select>
+ 
+ 
+	
+</mapper>

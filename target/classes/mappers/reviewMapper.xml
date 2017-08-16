@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="han.gyoul.shop.mapper.reviewMapper">
+	<insert id="insert">
+		insert into review_table (review_no, review_title,
+		review_content, review_image,
+		review_date, review_hit, mb_id, item_no)
+		values (review_table_seq.nextval, #{review_title}, #{review_content},
+		#{review_image, jdbcType=VARCHAR}, sysdate, 0, #{mb_id}, #{item_no})
+	</insert>
+
+	<select id="read" resultType="han.gyoul.shop.review.dto.ReviewDTO">
+		select review_no, review_title, review_image,
+		mb_id, review_date, review_content
+		from review_table
+		where review_no =
+		#{review_no}
+	</select>
+
+	<delete id="delete">
+		delete from review_table
+		where review_no =
+		#{review_no, jdbcType=INTEGER}
+	</delete>
+
+	<update id="update">
+		update review_table
+		set review_title =
+		#{review_title}, review_content = #{review_content}
+		where review_no =
+		#{review_no}
+	</update>
+
+	<select id="listAll" resultType="han.gyoul.shop.review.dto.ReviewDTO">
+
+		select review_no, review_title,
+		mb_id, review_date, review_hit
+		from review_table
+		where review_no > 0
+		order by review_no desc, review_date desc
+
+	</select>
+
+	<select id="listPage" resultType="han.gyoul.shop.review.dto.ReviewDTO">
+		<![CDATA[
+		
+			select * 
+			from(select review_no, review_title, mb_id, review_date, review_hit
+			, row_number() over(order by review_no desc, review_date desc) rn 
+			from review_table 
+			where review_no > 0) 
+			where rn BETWEEN #{page} AND #{page}+10
+			order by rn
+		
+		]]>
+	</select>
+
+	<select id="listCriteria" resultType="han.gyoul.shop.review.dto.ReviewDTO">
+		<![CDATA[
+		
+			select * 
+			from(select review_no, review_title, mb_id, review_date, review_hit, commentcnt
+			, row_number() over(order by review_no desc, review_date desc) rn 
+			from review_table 
+			where review_no > 0) 
+			where rn BETWEEN #{page} + (#{perPageNum} * (#{page} - 1)) AND #{perPageNum} * #{page}
+			order by rn
+		]]>
+	</select>
+
+	<select id="countPaging" resultType="int">
+		<![CDATA[
+			select count(review_no) 
+			from review_table 
+			where review_no > 0
+		]]>
+	</select>
+
+	<sql id="search1">
+      <if test="searchType == null">
+      </if>
+      <if test="searchType != null">
+         <if test="searchType == 't'.toString()">
+            and review_title like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'c'.toString()">
+            and review_content like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'w'.toString()">
+            and mb_id like ('%'|| #{keyword}|| '%')
+         </if>
+         <if test="searchType == 'tc'.toString()">
+            and ( review_title like ('%'|| #{keyword}|| '%') OR review_content like
+            ('%'|| #{keyword}|| '%'))
+         </if>
+         <if test="searchType == 'cw'.toString()">
+            and ( review_content like ('%'|| #{keyword}|| '%') OR mb_id
+            like ('%'|| #{keyword}|| '%'))
+         </if>
+         <if test="searchType == 'tcw'.toString()">
+            and ( review_title like ('%'|| #{keyword}|| '%')
+            OR
+            review_content like
+            ('%'|| #{keyword}|| '%')
+            OR
+            mb_id like ('%'|| #{keyword}|| '%'))
+         </if>
+      </if>
+   </sql>
+
+   <sql id="search">
+      <if test="searchType == null">
+         ) where review_no > 0
+      </if>
+      <if test="searchType == ''.toString()">
+         and review_title like ('%'|| #{keyword}|| '%')) where review_no > 0
+      </if>
+      <if test="searchType == 't'.toString()">
+         and review_title like ('%'|| #{keyword}|| '%')) where review_no > 0
+      </if>
+      <if test="searchType == 'c'.toString()">
+         and review_content like ('%'|| #{keyword}|| '%')) where review_no > 0
+      </if>
+      <if test="searchType == 'w'.toString()">
+         and mb_id like ('%'|| #{keyword}|| '%')) where review_no > 0
+      </if>
+      <if test="searchType == 'tc'.toString()">
+         and ( review_title like ('%'|| #{keyword}|| '%') OR review_content like
+         ('%'||
+         #{keyword}|| '%'))) where review_no > 0
+      </if>
+      <if test="searchType == 'cw'.toString()">
+         and ( review_content like ('%'|| #{keyword}|| '%') OR mb_id like
+         ('%'||
+         #{keyword}|| '%'))) where review_no > 0
+      </if>
+      <if test="searchType == 'tcw'.toString()">
+         and ( review_title like ('%'|| #{keyword}|| '%')) where review_no > 0
+         OR
+         review_content like ('%'|| #{keyword}|| '%')) where review_no > 0
+         OR
+         mb_id like
+         ('%'|| #{keyword}|| '%'))) where review_no > 0
+      </if>
+
+   </sql>
+
+   <select id="listSearch" resultType="han.gyoul.shop.review.dto.ReviewDTO">
+		<![CDATA[  
+		  select * 
+		  from (select review_no
+		  , review_title
+		  ,mb_id
+		  ,review_date
+		  , review_hit
+		  , commentcnt
+		  ,row_number() over(order by review_no desc) rn
+		  from review_table
+		  where review_no > 0 and item_no = #{item_no, jdbcType=INTEGER}
+		]]>
+
+      <include refid="search"></include>
+  
+		<![CDATA[    
+		  AND rn BETWEEN #{cri.page} + (#{cri.perPageNum} * (#{cri.page} - 1)) AND #{cri.perPageNum} * #{cri.page}
+		  order by rn
+		]]>
+
+   </select>
+
+   <select id="listSearchCount" resultType="int">
+		<![CDATA[ 
+		select count(review_no) 
+		from review_table 
+		where review_no > 0 
+		]]>
+      <include refid="search1"></include>
+   </select>
+   
+   <update id="updateCommentCnt">
+   	update review_table 
+   	set commentcnt = commentcnt + #{amount} 
+   	where review_no = #{review_no}
+   </update>
+   
+   <update id="updateViewCnt">
+   	update review_table set review_hit = review_hit + 1 where review_no = #{review_no}
+   </update>
+</mapper>

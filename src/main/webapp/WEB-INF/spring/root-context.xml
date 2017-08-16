@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+
+	<!-- Root Context: defines shared resources visible to all other web components -->
+
+	<!-- spring-jdbc -->
+	<bean class="org.springframework.jdbc.datasource.DriverManagerDataSource"
+		id="dataSource">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver"></property>
+		<property name="url"
+			value="jdbc:oracle:thin:@mrhonga.iptime.org:1800:orcl"></property>
+		<property name="username" value="Hangyoul"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+
+	<!-- spring-jdbc -->
+	<!-- java.lang.NoClassDefFoundError: org/springframework/jdbc/datasource/TransactionAwareDataSourceProxy -->
+	<!-- spring-jdbc-4.0.0.RELEASE 라이브러리를 안 넣어주면 상단 에러 발생 -->
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:mybatis-config.xml"></property>
+		<property name="mapperLocations" value="classpath:mappers/*Mapper.xml"></property>
+	</bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<tx:annotation-driven />
+	<!-- MyBatis에서 스프링 연동모듈의 핵심 -->
+	<!-- SqlSession 인터페이스의 구현체이며 코드에서 SqlSession 인터페이스 인스턴스를 대체하는 역할 -->
+	<!-- SqlSession 인터페이스는 데ㅣ터베이스에 대해 SQL 명령어를 실행하기 위해 필요한 모든 메서드를 가지고 있다. -->
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSession"
+		destroy-method="clearCache">
+		<constructor-arg name="sqlSessionFactory" ref="sqlSessionFactory" />
+	</bean>
+	<context:component-scan base-package="han.gyoul.shop.*" />
+</beans>

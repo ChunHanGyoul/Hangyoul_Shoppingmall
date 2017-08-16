@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<bean class="org.apache.commons.dbcp2.BasicDataSource" id="basicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver"></property>
+		<property name="url" value="jdbc:oracle:thin:@mrhonga.iptime.org:1800:orcl"></property>
+		<property name="username" value="Hangyoul"></property>
+		<property name="password" value="1234"></property>
+	</bean>
+	<context:annotation-config />
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean" id="sqlSessionFactoryBean">
+		<property name="dataSource" ref="basicDataSource" />
+		<property name="mapperLocations">
+			<list>
+				<value>classpath:mappers/**/*Mapper.xml</value>
+			</list>
+		</property>
+	</bean>
+	<bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate">
+		<constructor-arg ref="sqlSessionFactoryBean" />
+	</bean>
+
+	<bean class="han.gyoul.shop.board.dao.BoardDAO" id="boardDAO">
+		<property name="template" ref="sqlSessionTemplate"></property>
+	</bean>
+	<bean class="han.gyoul.shop.board.dao.NoticeDAO" id="noticeDAO">
+		<property name="template" ref="sqlSessionTemplate"></property>
+	</bean>
+</beans>

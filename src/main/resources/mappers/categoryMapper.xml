@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="han.gyoul.shop.mappers.categoryMapper">
+	
+	<select id="getSubclassList" parameterType="java.util.Map" resultType="han.gyoul.shop.category.dto.CategoryDTO">
+		select subclass_no, category_name from category_table
+		where category_no = ${category_no}
+	</select>
+	
+	<select id="getCategoryList" resultType="han.gyoul.shop.category.dto.CategoryDTO">
+		select * from category_table 
+		order by category_no, subclass_no
+	</select>
+	
+	<select id="category_noCheck" parameterType="java.util.Map" resultType="han.gyoul.shop.category.dto.CategoryDTO">
+		select * from category_table
+		where category_no = ${category_no}
+	</select>	
+	
+	<select id="subclass_noCheck" parameterType="java.util.Map" resultType="han.gyoul.shop.category.dto.CategoryDTO">
+		select * from category_table
+		where category_no = ${category_no} and subclass_no = ${subclass_no}
+    </select>
+    
+    <insert id="categoryInsert" parameterType="java.util.Map">
+    	insert into category_table (category_no, subclass_no, category_name)
+    	values(${category_no}, ${subclass_no}, '${category_name}')
+    </insert>
+    
+    <update id="subclassModify">
+    	update category_table set category_no = ${category_no}, subclass_no = ${subclass_no}, category_name = '${category_name}'
+    	where category_no = ${origin_category_no} and subclass_no = ${origin_subclass_no}
+    </update>
+    
+    <update id="categoryModify">
+    	update category_table set category_no = ${category_no}, category_name = '${category_name}'
+    	where category_no = ${origin_category_no} and category_name = '${origin_category_name}'
+    </update>
+    
+    <delete id="categoryDelete">
+    	delete from category_table where category_no = ${category_no}
+    </delete>
+    
+    <delete id="subclassDelete">
+    	delete from category_table where category_no = ${category_no} and subclass_no = ${subclass_no}
+    </delete>
+</mapper>

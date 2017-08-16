@@ -1,0 +1,9 @@
+div.information{
+	position: absolute;
+	left: 15cm;
+	top : 5cm;
+}
+
+input[id="mb_bday"]{
+	width: 2.6cm;
+}

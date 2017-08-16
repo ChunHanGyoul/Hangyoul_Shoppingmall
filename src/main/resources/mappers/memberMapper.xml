@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="han.gyoul.mapper.MemberMapper">
+
+	<insert id="insertMember">
+		insert into member_table(mb_no, mb_id, mb_pw, mb_nickname, mb_email, mb_zipcode, mb_address, mb_name, mb_sex, mb_bday, mb_mobile, mb_grade)
+		values (member_table_seq.nextval, #{mb_id}, #{mb_pw}, #{mb_nickname}, #{mb_email}, #{mb_zipcode}, #{mb_address}, #{mb_name}, #{mb_sex},to_date(#{mb_bday}), #{mb_mobile}, #{mb_grade})
+	</insert>
+	
+	<select id="login" resultType="han.gyoul.shop.member.dto.MemberDTO">
+		select mb_no, mb_id, mb_pw, mb_nickname, mb_grade from member_table <!-- 패스워드 꼭 지우삼 -->
+		where mb_id=#{mb_id} and mb_pw=#{mb_pw}
+	</select>
+	
+	<select id="memberRead" resultType="han.gyoul.shop.member.dto.MemberDTO">
+		select * from member_table
+		where mb_pw = #{mb_pw} and mb_id = #{mb_id}
+	</select>
+	
+	<update id="updateMember">
+		update member_table set mb_pw = #{mb_pw}, mb_email = #{mb_email}, mb_zipcode = #{mb_zipcode}, mb_address = #{mb_address}, mb_name = #{mb_name}, mb_sex = #{mb_sex}, mb_mobile = #{mb_mobile}
+		where mb_no = #{mb_no} 
+	</update>
+	
+	<delete id="deleteMember">
+		delete from member_table 
+		where mb_no = #{mb_no} 
+	</delete>
+	
+	<select id="idUnique" resultType="java.lang.String">
+		select mb_id from member_table
+		where mb_id = #{mb_id}
+	</select>
+	
+	<select id="nickNameUnique" resultType="java.lang.String">
+		select mb_nickname from member_table
+		where mb_nickname = #{mb_nickname}
+	</select>
+	
+</mapper>
